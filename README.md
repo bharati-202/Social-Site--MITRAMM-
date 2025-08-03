@@ -1,0 +1,2 @@
+# Social Site (MITRAMM)
+A Social Networking Site built with modern web technologies. This project allows users to create profiles, connect with friends, share posts, like and comment, and interact in a secure online environment. Features include user authentication, real-time notifications, and a responsive user interface. Ideal for learning full-stack development and social media platform concepts.
