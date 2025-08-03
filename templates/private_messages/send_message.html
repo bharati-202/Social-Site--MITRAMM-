@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Message to {{ recipient.username }} - Social Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Send Message to {{ recipient.username }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <textarea class="form-control" name="content" rows="5" placeholder="Type your message..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Message
+                        </button>
+                        <a href="{% url 'private_messages:messages' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Messages
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

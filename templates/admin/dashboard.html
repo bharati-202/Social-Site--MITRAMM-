@@ -1,0 +1,183 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<style>
+    .dashboard-card {
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: transform 0.3s;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-card {
+        background-color: #fff;
+        border-left: 4px solid #007bff;
+        padding: 15px;
+    }
+    .stat-card h3 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .stat-card p {
+        margin: 5px 0 0;
+        color: #6c757d;
+    }
+    .stat-card.users {
+        border-left-color: #28a745;
+    }
+    .stat-card.posts {
+        border-left-color: #17a2b8;
+    }
+    .stat-card.comments {
+        border-left-color: #ffc107;
+    }
+    .stat-card.likes {
+        border-left-color: #dc3545;
+    }
+    .stat-card.friendships {
+        border-left-color: #6f42c1;
+    }
+    .stat-card.requests {
+        border-left-color: #fd7e14;
+    }
+    .activity-list {
+        list-style: none;
+        padding: 0;
+    }
+    .activity-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .activity-list li:last-child {
+        border-bottom: none;
+    }
+    .chart-container {
+        height: 300px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Social Network Dashboard</h1>
+    
+    <!-- User Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card users">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+                <div class="mt-2">
+                    <small>Today: {{ new_users_today }} | This Week: {{ new_users_week }} | This Month: {{ new_users_month }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card posts">
+                <h3>{{ total_posts }}</h3>
+                <p>Total Posts</p>
+                <div class="mt-2">
+                    <small>Today: {{ new_posts_today }} | This Week: {{ new_posts_week }} | This Month: {{ new_posts_month }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card comments">
+                <h3>{{ total_comments }}</h3>
+                <p>Total Comments</p>
+                <div class="mt-2">
+                    <small>Today: {{ new_comments_today }} | This Week: {{ new_comments_week }} | This Month: {{ new_comments_month }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card likes">
+                <h3>{{ total_likes }}</h3>
+                <p>Total Likes</p>
+                <div class="mt-2">
+                    <small>Today: {{ new_likes_today }} | This Week: {{ new_likes_week }} | This Month: {{ new_likes_month }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card friendships">
+                <h3>{{ total_friendships }}</h3>
+                <p>Total Friendships</p>
+                <div class="mt-2">
+                    <small>Today: {{ new_friendships_today }} | This Week: {{ new_friendships_week }} | This Month: {{ new_friendships_month }}</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="dashboard-card stat-card requests">
+                <h3>{{ total_requests }}</h3>
+                <p>Friend Requests</p>
+                <div class="mt-2">
+                    <small>Pending: {{ pending_requests }} | Accepted: {{ accepted_requests }} | Rejected: {{ rejected_requests }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Most Active Users and Most Liked Posts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Most Active Users</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="activity-list">
+                        {% for user in most_active_users %}
+                            <li>
+                                <div class="d-flex align-items-center">
+                                    {% if user.profile_picture %}
+                                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle me-2" width="40" height="40">
+                                    {% else %}
+                                        <i class="bi bi-person-circle me-2" style="font-size: 2rem;"></i>
+                                    {% endif %}
+                                    <div>
+                                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+                                        <div>
+                                            <small>Posts: {{ user.post_count }} | Comments: {{ user.comment_count }} | Likes: {{ user.like_count }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Most Liked Posts</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="activity-list">
+                        {% for post in most_liked_posts %}
+                            <li>
+                                <div>
+                                    <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                                    <p class="mb-1">{{ post.content|truncatechars:100 }}</p>
+                                    <small class="text-muted">{{ post.created_at|date:"M d, Y" }} | Likes: {{ post.like_count }}</small>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

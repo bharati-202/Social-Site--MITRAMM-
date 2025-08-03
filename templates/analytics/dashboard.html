@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Analytics Dashboard</h1>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2 class="card-text">{{ total_users }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Posts</h5>
+                    <h2 class="card-text">{{ total_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Comments</h5>
+                    <h2 class="card-text">{{ total_comments }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Messages</h5>
+                    <h2 class="card-text">{{ total_messages }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Activity Chart -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Daily Activity (Last 30 Days)</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="dailyActivityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- User Activity Chart -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">User Activity (Last 30 Days)</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="userActivityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Active Users -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Top Active Users</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Posts</th>
+                            <th>Comments</th>
+                            <th>Likes</th>
+                            <th>Total Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in top_users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.posts.count }}</td>
+                                <td>{{ user.comments.count }}</td>
+                                <td>{{ user.likes.count }}</td>
+                                <td>{{ user.activity_count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Daily Activity Chart
+    const dailyActivityCtx = document.getElementById('dailyActivityChart').getContext('2d');
+    new Chart(dailyActivityCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data.dates|safe }},
+            datasets: [
+                {
+                    label: 'Posts',
+                    data: {{ chart_data.posts|safe }},
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Comments',
+                    data: {{ chart_data.comments|safe }},
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Likes',
+                    data: {{ chart_data.likes|safe }},
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // User Activity Chart
+    const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+    new Chart(userActivityCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_data.dates|safe }},
+            datasets: [
+                {
+                    label: 'Active Users',
+                    data: {{ chart_data.active_users|safe }},
+                    borderColor: 'rgb(255, 159, 64)',
+                    tension: 0.1
+                },
+                {
+                    label: 'New Users',
+                    data: {{ chart_data.new_users|safe }},
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %} 

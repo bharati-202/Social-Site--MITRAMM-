@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Account Settings - Social Network{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Account Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.mobile_number|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    {{ form.bio|as_crispy_field }}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.profile_picture|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.date_of_birth|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.location|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.website|as_crispy_field }}
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Save Changes
+                        </button>
+                        <a href="{% url 'accounts:profile' user.username %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Profile
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

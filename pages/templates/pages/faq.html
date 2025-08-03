@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ - Social Network{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">Frequently Asked Questions</h1>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="faqAccordion">
+                        <!-- Account Questions -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountCollapse">
+                                    Account Questions
+                                </button>
+                            </h2>
+                            <div id="accountCollapse" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <h5>How do I create an account?</h5>
+                                    <p>Click the "Sign Up" button in the top right corner and follow the registration process.</p>
+
+                                    <h5>How do I reset my password?</h5>
+                                    <p>Click "Forgot Password" on the login page and follow the instructions sent to your email.</p>
+
+                                    <h5>Can I change my username?</h5>
+                                    <p>Yes, you can change your username in your account settings.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Privacy & Security -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#privacyCollapse">
+                                    Privacy & Security
+                                </button>
+                            </h2>
+                            <div id="privacyCollapse" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <h5>How is my data protected?</h5>
+                                    <p>We use industry-standard encryption and security measures to protect your data.</p>
+
+                                    <h5>Who can see my posts?</h5>
+                                    <p>You can control the visibility of your posts in your privacy settings.</p>
+
+                                    <h5>How do I report inappropriate content?</h5>
+                                    <p>Click the three dots (...) on any post and select "Report" to flag inappropriate content.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Features -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#featuresCollapse">
+                                    Features
+                                </button>
+                            </h2>
+                            <div id="featuresCollapse" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <h5>How do I add friends?</h5>
+                                    <p>Search for users and click the "Add Friend" button on their profile.</p>
+
+                                    <h5>Can I customize my profile?</h5>
+                                    <p>Yes, you can customize your profile picture, cover photo, and bio in your profile settings.</p>
+
+                                    <h5>How do I create a group?</h5>
+                                    <p>Go to the Groups section and click "Create Group" to start a new group.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Troubleshooting -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#troubleshootingCollapse">
+                                    Troubleshooting
+                                </button>
+                            </h2>
+                            <div id="troubleshootingCollapse" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    <h5>What should I do if I can't log in?</h5>
+                                    <p>Try resetting your password or contact our support team for assistance.</p>
+
+                                    <h5>Why can't I upload photos?</h5>
+                                    <p>Check that your file meets our size and format requirements. If issues persist, try clearing your browser cache.</p>
+
+                                    <h5>How do I contact support?</h5>
+                                    <p>Visit our Contact page or email support@socialnetwork.com for assistance.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

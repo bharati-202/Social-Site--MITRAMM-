@@ -1,0 +1,74 @@
+{% if banners %}
+<div class="banner-slider">
+    <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            {% for banner in banners %}
+            <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
+                {% if forloop.first %}class="active" aria-current="true"{% endif %}
+                aria-label="Slide {{ forloop.counter }}">
+            </button>
+            {% endfor %}
+        </div>
+        
+        <div class="carousel-inner">
+            {% for banner in banners %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                {% if banner.url %}
+                <a href="{{ banner.url }}" class="d-block w-100">
+                {% endif %}
+                    <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>{{ banner.title }}</h5>
+                        <p>{{ banner.description }}</p>
+                    </div>
+                {% if banner.url %}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<style>
+.banner-slider {
+    margin-bottom: 2rem;
+}
+
+.carousel-item {
+    height: 400px;
+    overflow: hidden;
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.carousel-caption h5 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.carousel-caption p {
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+</style>
+{% endif %} 

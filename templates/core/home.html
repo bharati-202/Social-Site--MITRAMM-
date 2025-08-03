@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-8">
+            {% if user.is_authenticated %}
+                <!-- Create Post Form -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form method="post" action="{% url 'core:create_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea class="form-control" name="content" rows="3" placeholder="What's on your mind?"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <input type="file" class="form-control" name="image" accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <input type="file" class="form-control" name="video" accept="video/*">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Posts -->
+            {% for post in posts %}
+                {% if post.author and post.author.username %}
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none">
+                                    {% if post.author.profile_image %}
+                                    <img src="{{ post.author.profile_image.url }}" 
+                                         alt="{{ post.author.username }}" 
+                                         class="rounded-circle me-2" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                    <img src="{% static 'images/default_profile.png' %}" 
+                                         alt="{{ post.author.username }}" 
+                                         class="rounded-circle me-2" 
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div>
+                                    <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none">
+                                        <h6 class="mb-0 text-dark">{{ post.author.get_full_name|default:post.author.username }}</h6>
+                                    </a>
+                                    <small class="text-muted">@{{ post.author.username }}</small>
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-dark" type="button" id="postDropdown{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="postDropdown{{ post.id }}">
+                                    <li><a class="dropdown-item" href="{% url 'core:post_detail' post.id %}">View Post</a></li>
+                                    {% if post.author == user %}
+                                    <li><a class="dropdown-item" href="{% url 'core:edit_post' post.id %}">Edit Post</a></li>
+                                    <li><a class="dropdown-item text-danger" href="{% url 'core:delete_post' post.id %}">Delete Post</a></li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#shareModal{{ post.id }}">
+                                            <i class="bi bi-share"></i> Share Post
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ post.content }}</p>
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
+                        {% endif %}
+                        {% if post.video %}
+                        <video class="img-fluid rounded mb-3" controls>
+                            <source src="{{ post.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{% url 'core:like_post' post.id %}" class="text-decoration-none me-3">
+                                    <i class="bi {% if post.is_liked_by_user %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                                    <span class="ms-1">{{ post.likes_count }}</span>
+                                </a>
+                                <a href="{% url 'core:post_detail' post.id %}" class="text-decoration-none me-3">
+                                    <i class="bi bi-chat"></i>
+                                    <span class="ms-1">{{ post.comments_count }}</span>
+                                </a>
+                                <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#shareModal{{ post.id }}">
+                                    <i class="bi bi-share"></i>
+                                    <span class="ms-1">Share</span>
+                                </a>
+                            </div>
+                            <small class="text-muted">{{ post.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Share Modal -->
+                <div class="modal fade" id="shareModal{{ post.id }}" tabindex="-1" aria-labelledby="shareModalLabel{{ post.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="shareModalLabel{{ post.id }}">Share Post</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary" onclick="shareOnFacebook('{{ request.build_absolute_uri }}')">
+                                        <i class="bi bi-facebook me-2"></i>Share on Facebook
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="shareOnTwitter('{{ post.content|truncatechars:100 }}', '{{ request.build_absolute_uri }}')">
+                                        <i class="bi bi-twitter me-2"></i>Share on Twitter
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="shareOnWhatsApp('{{ post.content|truncatechars:100 }}', '{{ request.build_absolute_uri }}')">
+                                        <i class="bi bi-whatsapp me-2"></i>Share on WhatsApp
+                                    </button>
+                                    <button class="btn btn-outline-secondary" onclick="copyToClipboard('{{ request.build_absolute_uri }}')">
+                                        <i class="bi bi-clipboard me-2"></i>Copy Link
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% empty %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="mb-0">No posts yet. Follow some users to see their posts here!</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-md-4">
+            <!-- Trending Topics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Trending Topics</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        {% for topic in trending_topics %}
+                        <li class="mb-2">
+                            <a href="{% url 'core:topic_posts' topic.name %}" class="text-decoration-none">
+                                #{{ topic.name }}
+                            </a>
+                            <small class="text-muted">({{ topic.post_count }} posts)</small>
+                        </li>
+                        {% empty %}
+                        <li class="text-muted">No trending topics yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Suggested Users -->
+            {% if suggested_users %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Suggested Users</h5>
+                </div>
+                <div class="card-body">
+                    {% for user in suggested_users %}
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="{% url 'accounts:profile' user.username %}" class="text-decoration-none">
+                            {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" 
+                                 alt="{{ user.username }}" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                            <img src="{% static 'images/default_profile.png' %}" 
+                                 alt="{{ user.username }}" 
+                                 class="rounded-circle me-2" 
+                                 style="width: 40px; height: 40px; object-fit: cover;">
+                            {% endif %}
+                        </a>
+                        <div class="flex-grow-1">
+                            <a href="{% url 'accounts:profile' user.username %}" class="text-decoration-none">
+                                <h6 class="mb-0 text-dark">{{ user.get_full_name|default:user.username }}</h6>
+                            </a>
+                            <small class="text-muted">@{{ user.username }}</small>
+                        </div>
+                        <form method="post" action="{% url 'friends:send_request' user.username %}" class="ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-primary">Follow</button>
+                        </form>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="my-2">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

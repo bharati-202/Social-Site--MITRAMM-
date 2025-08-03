@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Sitemap - Social Network{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">Sitemap</h1>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Main Pages -->
+                        <div class="col-md-6 mb-4">
+                            <h3>Main Pages</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{% url 'accounts:home' %}" class="text-decoration-none">
+                                        <i class="bi bi-house-door me-2"></i>Home
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:about' %}" class="text-decoration-none">
+                                        <i class="bi bi-info-circle me-2"></i>About Us
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:contact' %}" class="text-decoration-none">
+                                        <i class="bi bi-envelope me-2"></i>Contact Us
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:faq' %}" class="text-decoration-none">
+                                        <i class="bi bi-question-circle me-2"></i>FAQ
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Legal Pages -->
+                        <div class="col-md-6 mb-4">
+                            <h3>Legal Pages</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:privacy_policy' %}" class="text-decoration-none">
+                                        <i class="bi bi-shield-lock me-2"></i>Privacy Policy
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:terms_of_service' %}" class="text-decoration-none">
+                                        <i class="bi bi-file-text me-2"></i>Terms of Service
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- User Features -->
+                        <div class="col-md-6 mb-4">
+                            <h3>User Features</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{% url 'accounts:login' %}" class="text-decoration-none">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'account_signup' %}" class="text-decoration-none">
+                                        <i class="bi bi-person-plus me-2"></i>Sign Up
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'friends:friend_list' %}" class="text-decoration-none">
+                                        <i class="bi bi-people me-2"></i>Friends
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'private_messages:inbox' %}" class="text-decoration-none">
+                                        <i class="bi bi-chat-dots me-2"></i>Messages
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Additional Resources -->
+                        <div class="col-md-6 mb-4">
+                            <h3>Additional Resources</h3>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{% url 'pages:sitemap' %}" class="text-decoration-none">
+                                        <i class="bi bi-diagram-3 me-2"></i>Sitemap
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{% url 'accounts:search_users' %}" class="text-decoration-none">
+                                        <i class="bi bi-search me-2"></i>Search Users
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Social Network{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Post Slider -->
+                <div class="card mb-4">
+                    <div class="card-body">
+            <h4 class="card-title mb-4">Featured Posts</h4>
+            <div id="postSlider" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    {% for post in posts %}
+                        <button type="button" data-bs-target="#postSlider" data-bs-slide-to="{{ forloop.counter0 }}" 
+                                {% if forloop.first %}class="active"{% endif %}></button>
+                    {% endfor %}
+                </div>
+                <div class="carousel-inner">
+                    {% for post in posts %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {% if post.image %}
+                                        <img src="{{ post.image.url }}" class="d-block w-100 rounded" alt="Post image" style="height: 400px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="d-block w-100 rounded bg-light" style="height: 400px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 d-flex flex-column justify-content-center">
+                                    <div class="post-content">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none">
+                                                {% if post.author.profile_picture %}
+                                                    <img src="{{ post.author.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% else %}
+                                                    <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                                {% endif %}
+                                            </a>
+                                            <div>
+                                                <h5 class="mb-0">
+                                                    <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none text-dark">
+                                                        {{ post.author.get_full_name }}
+                                                    </a>
+                                                </h5>
+                                                <small class="text-muted">@{{ post.author.username }}</small>
+                                                {% if post.author.bio %}
+                                                    <p class="small text-muted mb-0">{{ post.author.bio|truncatechars:50 }}</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <p class="post-description mb-3">{{ post.content|truncatechars:200 }}</p>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <form action="{% url 'posts:like_post' post.pk %}" method="post" class="like-form">
+                            {% csrf_token %}
+                                                <button type="submit" class="btn btn-link p-0 me-2">
+                                                    <i class="bi {% if request.user in post.likes.all %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                                                </button>
+                                            </form>
+                                            <span class="likes-count">{{ post.likes.count }} likes</span>
+                                        </div>
+                                        <a href="{% url 'posts:post_detail' post.pk %}" class="btn btn-primary">
+                                            <i class="bi bi-eye me-2"></i>View Full Post
+                                        </a>
+                                    </div>
+                            </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#postSlider" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#postSlider" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+                    </div>
+                </div>
+                
+    <!-- All Posts and Suggested Friends Section -->
+    <div class="row">
+        <!-- Recent Posts -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% for post in posts %}
+                        <div class="post-item mb-4">
+                            <div class="d-flex align-items-center mb-3">
+                                    <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none">
+                                        {% if post.author.profile_picture %}
+                                        <img src="{{ post.author.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        {% else %}
+                                        <img src="{% static 'images/default_profile.png' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'accounts:profile' post.author.username %}" class="text-decoration-none text-dark">
+                                            {{ post.author.get_full_name }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">@{{ post.author.username }}</small>
+                                    <small class="text-muted d-block">{{ post.created_at|date:"F j, Y H:i" }}</small>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-dark p-0" type="button" id="postDropdown{{ post.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="postDropdown{{ post.id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'posts:post_detail' post.pk %}">
+                                                <i class="bi bi-eye me-2"></i>View Post
+                                            </a>
+                                        </li>
+                                        {% if request.user == post.author %}
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'posts:edit_post' post.pk %}">
+                                                    <i class="bi bi-pencil me-2"></i>Edit Post
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deletePostModal{{ post.id }}">
+                                                    <i class="bi bi-trash me-2"></i>Delete Post
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="card-text mb-3">{{ post.content }}</p>
+                                {% if post.image %}
+                                <img src="{{ post.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
+                            {% endif %}
+                            <div class="d-flex align-items-center">
+                                <form action="{% url 'posts:like_post' post.pk %}" method="post" class="like-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-link p-0 me-2">
+                                        <i class="bi {% if request.user in post.likes.all %}bi-heart-fill text-danger{% else %}bi-heart{% endif %}"></i>
+                                    </button>
+                                </form>
+                                <span class="likes-count">{{ post.likes.count }} likes</span>
+                                <a href="{% url 'posts:post_detail' post.pk %}" class="btn btn-link ms-3">
+                                    <i class="bi bi-chat me-1"></i>Comments
+                                </a>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="my-4">
+                                {% endif %}
+                                
+                            <!-- Delete Post Modal -->
+                            <div class="modal fade" id="deletePostModal{{ post.id }}" tabindex="-1" aria-labelledby="deletePostModalLabel{{ post.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deletePostModalLabel{{ post.id }}">Delete Post</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this post? This action cannot be undone.
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <form action="{% url 'posts:delete_post' post.pk %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                    </div>
+                    </div>
+
+        <!-- Suggested Friends -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Suggested Friends</h5>
+                </div>
+                <div class="card-body">
+                    {% for user in suggested_users %}
+                        <div class="d-flex align-items-center mb-3">
+                            <a href="{% url 'accounts:profile' user.username %}" class="text-decoration-none">
+                                <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default_profile.png' %}{% endif %}" 
+                                     alt="{{ user.get_full_name }}" 
+                                     class="rounded-circle me-3" 
+                                     style="width: 50px; height: 50px; object-fit: cover;">
+                            </a>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">
+                                    <a href="{% url 'accounts:profile' user.username %}" class="text-decoration-none text-dark">
+                                        {{ user.get_full_name }}
+                                    </a>
+                                </h6>
+                                <small class="text-muted">@{{ user.username }}</small>
+                                {% if user.bio %}
+                                    <p class="small text-muted mb-0">{{ user.bio }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <a href="{% url 'friends:send_request' user.username %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-person-plus"></i> Add Friend
+                                </a>
+                            </div>
+                        </div>
+                        {% if not forloop.last %}
+                            <hr class="my-2">
+            {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeForms = document.querySelectorAll('.like-form');
+        likeForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const button = form.querySelector('button');
+                    const icon = button.querySelector('i');
+                    const likesCount = form.parentElement.querySelector('.likes-count');
+                    
+                    if (data.liked) {
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill', 'text-danger');
+                    } else {
+                        icon.classList.remove('bi-heart-fill', 'text-danger');
+                        icon.classList.add('bi-heart');
+                    }
+                    likesCount.textContent = `${data.likes_count} likes`;
+                });
+            });
+        });
+    });
+</script>
+{% endblock %} 

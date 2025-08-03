@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Messages with {{ friend.username }} - Social Network{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <div class="flex-shrink-0">
+                    {% if friend.profile_picture %}
+                        <img src="{{ friend.profile_picture.url }}" class="rounded-circle" width="50" height="50">
+                    {% else %}
+                        <img src="{% static 'default-profile.svg' %}" class="rounded-circle" width="50" height="50">
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h5 class="mb-0">{{ friend.get_full_name }}</h5>
+                    <small class="text-muted">@{{ friend.username }}</small>
+                </div>
+            </div>
+            
+            <div class="card-body" style="height: 400px; overflow-y: auto;">
+                {% for message in messages %}
+                    <div class="d-flex mb-3 {% if message.sender == request.user %}justify-content-end{% endif %}">
+                        <div class="{% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %} p-3 rounded" style="max-width: 70%;">
+                            <p class="mb-0">{{ message.content }}</p>
+                            <small class="{% if message.sender == request.user %}text-white-50{% else %}text-muted{% endif %}">
+                                {{ message.created_at|timesince }} ago
+                            </small>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center text-muted">No messages yet. Start the conversation!</p>
+                {% endfor %}
+            </div>
+            
+            <div class="card-footer">
+                <form method="post" action="{% url 'friends:send_message' friend.username %}">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control" placeholder="Type your message..." required>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

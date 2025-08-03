@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Social Network{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    {% load static %}
+    <style>
+        :root {
+            --primary-color:rgb(171, 251, 243);      /* Navy blue */
+            --secondary-color:rgb(45, 42, 46);    /* Lavender */
+            --accent-color:rgb(82, 142, 138);       /* Rose */
+            --light-accent:rgb(209, 233, 252);       /* Light pink */
+            --background-color:rgb(238, 251, 252);   /* Light lavender background */
+            --dark-accent:rgb(253, 111, 75);        /* Deep purple */
+        }
+
+        body {
+            background-color: var(--background-color);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-accent)) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.81);
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .search-form {
+            min-width: 300px;
+        }
+
+        .search-form .form-control {
+            border: none;
+            background-color: rgb(238, 251, 252);
+            color: white;
+            border-radius: 20px 0 0 20px;
+        }
+
+        .search-form .form-control::placeholder {
+            color: rgba(37, 34, 34, 0.7);
+        }
+
+        .search-form .btn {
+            border-radius: 0 20px 20px 0;
+            background-color: var(--light-accent);
+            border: none;
+            color: black;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
+            background-color: var(--accent-color) !important;
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+
+        .nav-link {
+            color: rgb(82, 142, 138); !important;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: rgb(45, 42, 46); !important;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu {
+            background-color: var(--background-color);
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item {
+            color: var(--primary-color);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-accent);
+            color: var(--dark-accent);
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: black;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-accent)) !important;
+            color: rgba(255,255,255,0.8) !important;
+        }
+
+        .footer a:hover {
+            color: var(--light-accent) !important;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            transform: translateY(-3px);
+            transition: transform 0.2s;
+        }
+
+        .newsletter-form .form-control {
+            background-color: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+        }
+
+        .newsletter-form .form-control::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .newsletter-form .btn {
+            background-color: var(--light-accent);
+            color: var(--dark-accent);
+            border: none;
+        }
+
+        .newsletter-form .btn:hover {
+            background-color: white;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'accounts:home' %}">
+                <img src="{% static 'images/logo.svg' %}" alt="Social Network Logo" class="me-2">
+                <span>Social Network</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if user.is_authenticated %}
+                    <!-- Search Bar -->
+                    <form class="d-flex mx-auto search-form" action="{% url 'accounts:search_users' %}" method="GET">
+                        <div class="input-group">
+                            <input type="search" class="form-control" placeholder="Search users, posts..." name="q" value="{{ request.GET.q }}">
+                            <button class="btn" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Main Navigation -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="bi bi-house-door nav-icon"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:home' %}">
+                                <i class="bi bi-file-post nav-icon"></i>Posts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:profile' user.username %}">
+                                <i class="bi bi-person nav-icon"></i>Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'friends:friend_list' %}">
+                                <i class="bi bi-people nav-icon"></i>Friends
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'private_messages:messages' %}">
+                                <i class="bi bi-envelope"></i> Messages
+                            </a>
+                        </li>
+                        {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'analytics:dashboard' %}">
+                                <i class="bi bi-graph-up nav-icon"></i>Analytics
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- User Menu -->
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle nav-icon"></i>{{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:account_settings' %}">
+                                        <i class="bi bi-gear nav-icon"></i>Settings
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                        <i class="bi bi-box-arrow-right nav-icon"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer mt-auto py-4">
+        <div class="container">
+            <div class="row">
+                <!-- Quick Links -->
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-black mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="{% url 'pages:about' %}" class="text-black text-decoration-none">
+                                <i class="bi bi-info-circle me-2"></i>About Us
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'pages:privacy_policy' %}" class="text-black text-decoration-none">
+                                <i class="bi bi-shield-lock me-2"></i>Privacy Policy
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'pages:terms_of_service' %}" class="text-black text-decoration-none">
+                                <i class="bi bi-file-text me-2"></i>Terms of Service
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="{% url 'pages:contact' %}" class="text-black text-decoration-none">
+                                <i class="bi bi-envelope me-2"></i>Contact Us
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Social Media -->
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-black mb-3">Connect With Us</h5>
+                    <div class="social-links">
+                        <a href="https://facebook.com" class="text-black me-3" target="_blank">
+                            <i class="bi bi-facebook fs-4"></i>
+                        </a>
+                        <a href="https://twitter.com" class="text-black me-3" target="_blank">
+                            <i class="bi bi-twitter fs-4"></i>
+                        </a>
+                        <a href="https://instagram.com" class="text-black me-3" target="_blank">
+                            <i class="bi bi-instagram fs-4"></i>
+                        </a>
+                        <a href="https://linkedin.com" class="text-black me-3" target="_blank">
+                            <i class="bi bi-linkedin fs-4"></i>
+                        </a>
+                        <a href="https://youtube.com" class="text-black" target="_blank">
+                            <i class="bi bi-youtube fs-4"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-black mb-3">Stay Updated</h5>
+                    <p class="text-black">Subscribe to our Social Networking Site for the latest updates.</p>
+                    <form class="newsletter-form">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email address">
+                            <button class="btn btn-primary" type="submit">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <hr class="my-4 border-secondary">
+
+            <!-- Copyright -->
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-black-50">
+                        © 2025 Social Network. All rights reserved.
+                    </p>
+                </div>
+                {% comment %} <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0 text-white-50">
+                        <a href="{% url 'pages:sitemap' %}" class="text-white-50 text-decoration-none me-2">Sitemap</a>
+                        <a href="{% url 'pages:faq' %}" class="text-white-50 text-decoration-none">FAQ</a>
+                    </p>
+                </div> {% endcomment %}
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function shareOnFacebook(url) {
+        window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url), 
+                    'facebook-share-dialog', 
+                    'width=626,height=436');
+        return false;
+    }
+
+    function shareOnTwitter(text, url) {
+        window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url),
+                    'twitter-share-dialog',
+                    'width=626,height=436');
+        return false;
+    }
+
+    function shareOnWhatsApp(text, url) {
+        window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url),
+                    'whatsapp-share-dialog',
+                    'width=626,height=436');
+        return false;
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Link copied to clipboard!');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Social Network-Analytics{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Analytics Dashboard</h2>
+    
+    <!-- Date Range Info -->
+    <div class="alert alert-info">
+        Showing data from {{ date_range.start|date:"M d, Y" }} to {{ date_range.end|date:"M d, Y" }}
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2>{{ total_counts.users }}</h2>
+                    <p class="mb-0">Avg Daily Active: {{ avg_metrics.active_users|floatformat:1 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Posts</h5>
+                    <h2>{{ total_counts.posts }}</h2>
+                    <p class="mb-0">Avg Daily: {{ avg_metrics.posts|floatformat:1 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Comments</h5>
+                    <h2>{{ total_counts.comments }}</h2>
+                    <p class="mb-0">Avg Daily: {{ avg_metrics.comments|floatformat:1 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Friendships</h5>
+                    <h2>{{ total_counts.friendships }}</h2>
+                    <p class="mb-0">Avg Daily: {{ avg_metrics.friendships|floatformat:1 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Metrics -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Daily Activity</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Active Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for user in top_users %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>{{ user.user__username }}</span>
+                                    <span class="badge bg-primary rounded-pill">{{ user.total_activity }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional Metrics -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Engagement Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total Messages
+                            <span class="badge bg-primary rounded-pill">{{ total_counts.messages }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Avg Daily Messages
+                            <span class="badge bg-primary rounded-pill">{{ avg_metrics.messages|floatformat:1 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Avg Daily Likes
+                            <span class="badge bg-primary rounded-pill">{{ avg_metrics.likes|floatformat:1 }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prepare data for the chart
+    const dates = [
+        {% for metric in daily_metrics %}
+            '{{ metric.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const activeUsers = [
+        {% for metric in daily_metrics %}
+            {{ metric.active_users }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const newUsers = [
+        {% for metric in daily_metrics %}
+            {{ metric.new_users }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const posts = [
+        {% for metric in daily_metrics %}
+            {{ metric.total_posts }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // Create the chart
+    const ctx = document.getElementById('dailyActivityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Active Users',
+                    data: activeUsers,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },
+                {
+                    label: 'New Users',
+                    data: newUsers,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Posts',
+                    data: posts,
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Friends - Social Network{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- Friend Requests Section -->
+            {% if pending_requests %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Friend Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for request in pending_requests %}
+                            <div class="d-flex align-items-center mb-3">
+                                <a href="{% url 'accounts:profile' request.user1.username %}" class="text-decoration-none">
+                                    {% if request.user1.profile_picture %}
+                                        <img src="{{ request.user1.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/default-profile.svg' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'accounts:profile' request.user1.username %}" class="text-decoration-none text-dark">
+                                            {{ request.user1.get_full_name }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">@{{ request.user1.username }}</small>
+                                    <small class="text-muted d-block">Sent {{ request.created_at|timesince }} ago</small>
+                                </div>
+                                <div class="btn-group">
+                                    <form action="{% url 'friends:accept_request' request.id %}" method="post" class="me-2">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-lg"></i> Accept
+                                        </button>
+                                    </form>
+                                    <form action="{% url 'friends:reject_request' request.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="my-2">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Sent Requests Section -->
+            {% if sent_requests %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Sent Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for request in sent_requests %}
+                            <div class="d-flex align-items-center mb-3">
+                                <a href="{% url 'accounts:profile' request.user2.username %}" class="text-decoration-none">
+                                    {% if request.user2.profile_picture %}
+                                        <img src="{{ request.user2.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/default-profile.svg' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'accounts:profile' request.user2.username %}" class="text-decoration-none text-dark">
+                                            {{ request.user2.get_full_name }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">@{{ request.user2.username }}</small>
+                                    <small class="text-muted d-block">Sent {{ request.created_at|timesince }} ago</small>
+                                </div>
+                                <form action="{% url 'friends:cancel_request' request.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </button>
+                                </form>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="my-2">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Friends List Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Friends List</h5>
+                </div>
+                <div class="card-body">
+                    {% if friends_as_user1 or friends_as_user2 %}
+                        {% for friendship in friends_as_user1 %}
+                            <div class="d-flex align-items-center mb-3">
+                                <a href="{% url 'accounts:profile' friendship.user2.username %}" class="text-decoration-none">
+                                    {% if friendship.user2.profile_picture %}
+                                        <img src="{{ friendship.user2.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/default-profile.svg' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'accounts:profile' friendship.user2.username %}" class="text-decoration-none text-dark">
+                                            {{ friendship.user2.get_full_name }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">@{{ friendship.user2.username }}</small>
+                                    <small class="text-muted d-block">Friends since {{ friendship.created_at|date:"F j, Y" }}</small>
+                                </div>
+                                <form action="{% url 'friends:remove_friend' friendship.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-person-dash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="my-2">
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for friendship in friends_as_user2 %}
+                            <div class="d-flex align-items-center mb-3">
+                                <a href="{% url 'accounts:profile' friendship.user1.username %}" class="text-decoration-none">
+                                    {% if friendship.user1.profile_picture %}
+                                        <img src="{{ friendship.user1.profile_picture.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% else %}
+                                        <img src="{% static 'images/default-profile.svg' %}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    {% endif %}
+                                </a>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0">
+                                        <a href="{% url 'accounts:profile' friendship.user1.username %}" class="text-decoration-none text-dark">
+                                            {{ friendship.user1.get_full_name }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">@{{ friendship.user1.username }}</small>
+                                    <small class="text-muted d-block">Friends since {{ friendship.created_at|date:"F j, Y" }}</small>
+                                </div>
+                                <form action="{% url 'friends:remove_friend' friendship.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-person-dash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                            {% if not forloop.last %}
+                                <hr class="my-2">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">No friends yet. Start adding friends!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

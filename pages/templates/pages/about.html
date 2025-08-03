@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">{{ title }}</h2>
+                </div>
+                <div class="card-body">
+                    <h4>Our Mission</h4>
+                    <p>Welcome to our social network! We're dedicated to creating a safe and engaging platform where people can connect, share, and grow together.</p>
+                    
+                    <h4 class="mt-4">Our Story</h4>
+                    <p>Founded in 2024, our social network was created with the vision of bringing people closer together in a meaningful way. We believe in the power of community and the importance of authentic connections.</p>
+                    
+                    <h4 class="mt-4">Our Values</h4>
+                    <ul>
+                        <li>Community: Building meaningful connections</li>
+                        <li>Privacy: Protecting user data and security</li>
+                        <li>Innovation: Continuously improving our platform</li>
+                        <li>Inclusivity: Creating a welcoming space for all</li>
+                    </ul>
+                    
+                    <h4 class="mt-4">Contact Us</h4>
+                    <p>Have questions or feedback? We'd love to hear from you!</p>
+                    <a href="{% url 'pages:contact' %}" class="btn btn-primary">Get in Touch</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

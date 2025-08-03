@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ username }}'s Activity Report - Social Network{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">{{ username }}'s Activity Report</h2>
+    
+    <!-- Date Range Info -->
+    <div class="alert alert-info">
+        Showing data from {{ date_range.start|date:"M d, Y" }} to {{ date_range.end|date:"M d, Y" }}
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Posts</h5>
+                    <h2>{{ total_activity.posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Comments</h5>
+                    <h2>{{ total_activity.comments }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Likes</h5>
+                    <h2>{{ total_activity.likes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Messages</h5>
+                    <h2>{{ total_activity.messages }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Activity Chart -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Daily Activity</h5>
+        </div>
+        <div class="card-body">
+            <canvas id="dailyActivityChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Activity Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Detailed Activity</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Posts</th>
+                            <th>Comments</th>
+                            <th>Likes</th>
+                            <th>Messages</th>
+                            <th>Logins</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in user_activity %}
+                            <tr>
+                                <td>{{ activity.date|date:"M d, Y" }}</td>
+                                <td>{{ activity.post_count }}</td>
+                                <td>{{ activity.comment_count }}</td>
+                                <td>{{ activity.like_count }}</td>
+                                <td>{{ activity.message_count }}</td>
+                                <td>{{ activity.login_count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prepare data for the chart
+    const dates = [
+        {% for activity in user_activity %}
+            '{{ activity.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const posts = [
+        {% for activity in user_activity %}
+            {{ activity.post_count }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const comments = [
+        {% for activity in user_activity %}
+            {{ activity.comment_count }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const likes = [
+        {% for activity in user_activity %}
+            {{ activity.like_count }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const messages = [
+        {% for activity in user_activity %}
+            {{ activity.message_count }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    // Create the chart
+    const ctx = document.getElementById('dailyActivityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Posts',
+                    data: posts,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Comments',
+                    data: comments,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Likes',
+                    data: likes,
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Messages',
+                    data: messages,
+                    borderColor: 'rgb(255, 205, 86)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %} 

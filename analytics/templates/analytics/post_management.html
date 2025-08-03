@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Post Management - Social Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Post Management</h2>
+    
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" name="search" class="form-control" placeholder="Search posts..." value="{{ search_query }}">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="author" class="form-control" placeholder="Filter by author..." value="{{ author_filter }}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Posts List -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Author</th>
+                            <th>Content</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'profile' post.author.username %}" class="text-decoration-none">
+                                    {{ post.author.username }}
+                                </a>
+                            </td>
+                            <td>{{ post.content|truncatechars:100 }}</td>
+                            <td>{{ post.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'analytics:edit_post' post.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <a href="{% url 'analytics:delete_post' post.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No posts found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

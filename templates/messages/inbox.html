@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - Social Network{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Messages</h4>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        <div class="list-group">
+                            {% for message in messages %}
+                                <a href="{% url 'private_messages:conversation' message.sender.username %}" 
+                                   class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">
+                                            {% if message.sender == request.user %}
+                                                {{ message.recipient.username }}
+                                            {% else %}
+                                                {{ message.sender.username }}
+                                            {% endif %}
+                                        </h5>
+                                        <small class="text-muted">{{ message.created_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1">{{ message.content|truncatechars:100 }}</p>
+                                    {% if not message.is_read and message.recipient == request.user %}
+                                        <span class="badge bg-primary">New</span>
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No messages yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
